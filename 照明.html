@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電験三種 機械「照明」インタラクティブ学習ページ</title>
+    <style>
+        :root {
+            --primary-color: #005a9c;
+            --secondary-color: #f0f8ff;
+            --accent-color: #ffc107;
+            --text-color: #333;
+            --border-color: #ddd;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+        body {
+            font-family: 'Segoe UI', Meiryo, 'Hiragino Kaku Gothic ProN', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: none;
+            margin-bottom: 10px;
+        }
+        .header-sub {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* Tabs */
+        .tab-nav {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #e9ecef;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #fff;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-width: 2px 2px 0 2px;
+            border-style: solid;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Section: Basic Terms */
+        .accordion-item {
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .accordion-header {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .accordion-header:hover {
+            background-color: #e0f0ff;
+        }
+        .accordion-header .symbol {
+            font-size: 1.2em;
+            color: var(--primary-color);
+        }
+        .accordion-header::after {
+            content: '+';
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+        .accordion-header.active::after {
+            transform: rotate(45deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            padding: 0 15px;
+        }
+        .accordion-content.active {
+            max-height: 500px; /* 十分な高さを確保 */
+            padding: 15px;
+        }
+        .term-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .term-table th, .term-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+        .term-table th {
+            background-color: #f2f2f2;
+        }
+
+        /* Section: Formulas */
+        .calc-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .calc-box {
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #fdfdfd;
+        }
+        .calc-box h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-left: 5px solid var(--primary-color);
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Section: Lamps */
+        .lamp-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        .lamp-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .lamp-table th:hover {
+            background-color: #004a80;
+        }
+        .lamp-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+        }
+        .lamp-table tbody tr:nth-child(even) {
+            background-color: var(--secondary-color);
+        }
+        .lamp-name {
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Section: Quiz */
+        .quiz-container {
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #fdfdfd;
+        }
+        .quiz-question {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .quiz-options button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .quiz-options button:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--primary-color);
+        }
+        .quiz-feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .quiz-feedback.correct {
+            background-color: #e9f7ec;
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+        .quiz-feedback.incorrect {
+            background-color: #fdeaea;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+        #next-quiz-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 30px;
+            font-size: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #next-quiz-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>電験三種 機械「照明」</h1>
+    <p class="header-sub">インタラクティブ学習ページ</p>
+
+    <div class="tab-nav">
+        <button class="tab-button active" data-tab="terms">基本用語</button>
+        <button class="tab-button" data-tab="formulas">計算演習</button>
+        <button class="tab-button" data-tab="lamps">光源比較</button>
+        <button class="tab-button" data-tab="quiz">理解度チェック</button>
+    </div>
+
+    <!-- 1. 基本用語 -->
+    <div id="terms" class="tab-content active">
+        <h2>1. 照明の基本用語と単位</h2>
+        <p>照明分野の最重要項目です。各項目をクリックして詳細を確認しましょう。</p>
+        
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header"><span class="symbol">F [lm]</span>光束 (Luminous Flux)</div>
+                <div class="accordion-content">
+                    <p>光源から放出される<strong>光の総量</strong>のことです。「電球自体の明るさ」とイメージすると分かりやすいです。</p>
+                    <table class="term-table">
+                        <tr><th>記号</th><td>F または Φ</td></tr>
+                        <tr><th>単位</th><td>lm (ルーメン)</td></tr>
+                        <tr><th>覚え方</th><td>「束(Flux)」という言葉通り、光の束全体を指します。</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header"><span class="symbol">I [cd]</span>光度 (Luminous Intensity)</div>
+                <div class="accordion-content">
+                    <p>特定の方向へ向かう<strong>光の強さ</strong>を表します。「スポットライトの鋭さ」のように、方向を持った強さのイメージです。</p>
+                    <table class="term-table">
+                        <tr><th>記号</th><td>I</td></tr>
+                        <tr><th>単位</th><td>cd (カンデラ)</td></tr>
+                        <tr><th>覚え方</th><td>「キャンドル(Candle)」が語源。ろうそく1本の特定の方向への光の強さが基準です。</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header"><span class="symbol">E [lx]</span>照度 (Illuminance)</div>
+                <div class="accordion-content">
+                    <p>光に照らされる面の<strong>明るさ</strong>です。「机の上がどれだけ明るいか」という、受け取る側の明るさを示します。</p>
+                    <table class="term-table">
+                        <tr><th>記号</th><td>E</td></tr>
+                        <tr><th>単位</th><td>lx (ルクス)</td></tr>
+                        <tr><th>覚え方</th><td>「ラックス(Lux)」は身近な単位。天気予報などで聞く「〇〇ルクス」は太陽光の照度のことです。</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header"><span class="symbol">L [cd/m²]</span>輝度 (Luminance)</div>
+                <div class="accordion-content">
+                    <p>ある方向から見たときの、<strong>光源や面の輝き（まぶしさ）</strong>の度合いです。ディスプレイの明るさなどにも使われます。</p>
+                    <table class="term-table">
+                        <tr><th>記号</th><td>L</td></tr>
+                        <tr><th>単位</th><td>cd/m² (カンデラ毎平方メートル)</td></tr>
+                        <tr><th>覚え方</th><td>単位が「光度 ÷ 面積」となっているのがポイント。ある面積あたりの光の強さ、つまり「輝き」を表します。</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 計算演習 -->
+    <div id="formulas" class="tab-content">
+        <h2>2. 照明計算の基本法則</h2>
+        <p>数値を変更して、計算結果がどう変わるか試してみましょう。</p>
+        <div class="calc-container">
+            <div class="calc-box">
+                <h3>逆2乗の法則 / 余弦法則</h3>
+                <p><strong>E = (I / r²) × cosθ</strong></p>
+                <div class="input-group">
+                    <label for="calc_I">光度 I [cd]</label>
+                    <input type="number" id="calc_I" value="500" step="10">
+                </div>
+                <div class="input-group">
+                    <label for="calc_r">距離 r [m]</label>
+                    <input type="number" id="calc_r" value="2" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="calc_theta">角度 θ [°] (法線から)</label>
+                    <input type="number" id="calc_theta" value="30" step="1">
+                </div>
+                <div id="result_E" class="result">照度 E = 108.3 lx</div>
+            </div>
+
+            <div class="calc-box">
+                <h3>光束法による室照明計算</h3>
+                <p><strong>N = (E × A) / (F × U × M)</strong></p>
+                <div class="input-group">
+                    <label for="calc_E_room">平均照度 E [lx]</label>
+                    <input type="number" id="calc_E_room" value="750" step="10">
+                </div>
+                <div class="input-group">
+                    <label for="calc_A">部屋の面積 A [m²]</label>
+                    <input type="number" id="calc_A" value="100" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="calc_F">ランプ1個の光束 F [lm]</label>
+                    <input type="number" id="calc_F" value="4500" step="100">
+                </div>
+                <div class="input-group">
+                    <label for="calc_U">照明率 U</label>
+                    <input type="number" id="calc_U" value="0.7" step="0.01" min="0" max="1">
+                </div>
+                <div class="input-group">
+                    <label for="calc_M">保守率 M</label>
+                    <input type="number" id="calc_M" value="0.8" step="0.01" min="0" max="1">
+                </div>
+                <div id="result_N" class="result">必要な照明器具の数 N = 30 台</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 光源比較 -->
+    <div id="lamps" class="tab-content">
+        <h2>3. 各種光源（ランプ）の種類と特徴</h2>
+        <p>表のヘッダー（▲▼）をクリックして並べ替えができます。ランプ名をクリックすると詳細が表示されます。</p>
+        <table class="lamp-table">
+            <thead>
+                <tr>
+                    <th data-sort="name">種類 (▲▼)</th>
+                    <th data-sort="efficiency" class="sort-asc">効率 [lm/W] (▲▼)</th>
+                    <th data-sort="ra">演色性(Ra) (▲▼)</th>
+                    <th data-sort="life">寿命 (▲▼)</th>
+                    <th>特徴・用途</th>
+                </tr>
+            </thead>
+            <tbody id="lamp-table-body">
+                <!-- データはJavaScriptで生成 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 4. 理解度チェック -->
+    <div id="quiz" class="tab-content">
+        <h2>4. 理解度チェック</h2>
+        <p>学習した内容をクイズで確認してみましょう。</p>
+        <div class="quiz-container">
+            <div id="quiz-question" class="quiz-question"></div>
+            <div id="quiz-options" class="quiz-options"></div>
+            <div id="quiz-feedback" class="quiz-feedback" style="display: none;"></div>
+            <button id="next-quiz-btn" disabled>次の問題へ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- Tab-Switching Logic ---
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === button.dataset.tab) {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+
+    // --- Accordion Logic ---
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    accordionHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const content = header.nextElementSibling;
+            header.classList.toggle('active');
+            content.classList.toggle('active');
+        });
+    });
+
+    // --- Calculator Logic ---
+    const calcInputs = {
+        I: document.getElementById('calc_I'),
+        r: document.getElementById('calc_r'),
+        theta: document.getElementById('calc_theta'),
+        E_room: document.getElementById('calc_E_room'),
+        A: document.getElementById('calc_A'),
+        F: document.getElementById('calc_F'),
+        U: document.getElementById('calc_U'),
+        M: document.getElementById('calc_M'),
+    };
+    const calcResults = {
+        E: document.getElementById('result_E'),
+        N: document.getElementById('result_N'),
+    };
+
+    function calculateIlluminance() {
+        const I = parseFloat(calcInputs.I.value) || 0;
+        const r = parseFloat(calcInputs.r.value) || 1;
+        const theta = parseFloat(calcInputs.theta.value) || 0;
+        if (r === 0) {
+             calcResults.E.textContent = '距離rは0にできません';
+             return;
+        }
+        const E = (I / (r * r)) * Math.cos(theta * Math.PI / 180);
+        calcResults.E.textContent = `照度 E = ${E.toFixed(1)} lx`;
+    }
+
+    function calculateLamps() {
+        const E = parseFloat(calcInputs.E_room.value) || 0;
+        const A = parseFloat(calcInputs.A.value) || 0;
+        const F = parseFloat(calcInputs.F.value) || 1;
+        const U = parseFloat(calcInputs.U.value) || 1;
+        const M = parseFloat(calcInputs.M.value) || 1;
+        const denominator = F * U * M;
+        if (denominator === 0) {
+            calcResults.N.textContent = 'F, U, Mは0にできません';
+            return;
+        }
+        const N = (E * A) / denominator;
+        calcResults.N.textContent = `必要な照明器具の数 N = ${Math.ceil(N)} 台`;
+    }
+
+    Object.values(calcInputs).forEach(input => {
+        input.addEventListener('input', () => {
+            calculateIlluminance();
+            calculateLamps();
+        });
+    });
+    calculateIlluminance();
+    calculateLamps();
+
+    // --- Lamp Table Logic ---
+    const lampData = [
+        { name: '白熱電球', efficiency: 15, ra: 100, life: 1, desc: '熱放射で発光。安価で点灯が速いが、効率が悪く短寿命。暖かい光で演色性は最高。' },
+        { name: 'ハロゲン電球', efficiency: 25, ra: 100, life: 2, desc: '白熱電球の高効率・長寿命版。店舗のスポットライトなど、強い光と高い演色性が求められる場所で利用。' },
+        { name: '蛍光ランプ', efficiency: 90, ra: 85, life: 4, desc: 'ガス放電を利用。オフィスや家庭で長年主流だった光源。効率と演色性のバランスが良い。' },
+        { name: '高圧水銀ランプ', efficiency: 50, ra: 45, life: 4, desc: '青白い光が特徴。道路、工場、体育館など広い場所の照明に使われたが、現在はLED等に置き換えが進む。' },
+        { name: 'メタルハライドランプ', efficiency: 95, ra: 90, life: 3, desc: '水銀ランプの高効率・高演色版。スタジアムや商業施設など、明るさと色の見え方が重要な場所で活躍。' },
+        { name: '高圧ナトリウムランプ', efficiency: 130, ra: 25, life: 5, desc: '非常に高効率だが演色性が悪いオレンジ色の光。トンネルや高速道路の照明に最適。' },
+        { name: '低圧ナトリウムランプ', efficiency: 180, ra: 5, life: 4, desc: '最も効率が高い光源の一つ。単色のオレンジ光で演色性はほぼゼロ。霧の中でも見やすい特性を持つ。' },
+        { name: 'LEDランプ', efficiency: 150, ra: 95, life: 5, desc: '半導体(LED)を利用。高効率、長寿命、小型、即時点灯など利点が多く、現在の照明の主流となっている。' }
+    ];
+
+    const lampTableBody = document.getElementById('lamp-table-body');
+    const lampTableHeaders = document.querySelectorAll('.lamp-table th');
+    let sortState = { key: 'efficiency', order: 'asc' };
+
+    function renderLampTable() {
+        lampTableBody.innerHTML = '';
+        lampData
+            .sort((a, b) => {
+                let valA = a[sortState.key];
+                let valB = b[sortState.key];
+                if (typeof valA === 'string') {
+                    return sortState.order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+                return sortState.order === 'asc' ? valA - valB : valB - valA;
+            })
+            .forEach(lamp => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="lamp-name" data-desc="${lamp.desc}">${lamp.name}</span></td>
+                    <td>${lamp.efficiency}</td>
+                    <td>${lamp.ra}</td>
+                    <td>${'★'.repeat(lamp.life).padEnd(5, '☆')}</td>
+                    <td>${lamp.desc.substring(0, 20)}...</td>
+                `;
+                lampTableBody.appendChild(tr);
+            });
+        
+        // Add click event for details
+        document.querySelectorAll('.lamp-name').forEach(nameSpan => {
+            nameSpan.addEventListener('click', (e) => {
+                alert(`【${e.target.textContent}】\n${e.target.dataset.desc}`);
+            });
+        });
+
+        // Update header styles
+        lampTableHeaders.forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+            if(th.dataset.sort === sortState.key) {
+                th.classList.add(sortState.order === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
+    }
+
+    lampTableHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const key = header.dataset.sort;
+            if (key) {
+                if (sortState.key === key) {
+                    sortState.order = sortState.order === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortState.key = key;
+                    sortState.order = 'asc';
+                }
+                renderLampTable();
+            }
+        });
+    });
+
+    renderLampTable();
+
+    // --- Quiz Logic ---
+    const quizData = [
+        {
+            question: "光源から放出される光の総量を表す量の単位は？",
+            options: ["カンデラ (cd)", "ルクス (lx)", "ルーメン (lm)", "cd/m²"],
+            answer: "ルーメン (lm)"
+        },
+        {
+            question: "光源から2mの距離で照度が100 lxの点光源がある。距離が4mになると照度は何 lxになるか？",
+            options: ["200 lx", "50 lx", "25 lx", "12.5 lx"],
+            answer: "25 lx"
+        },
+        {
+            question: "照明率(U)や保守率(M)を用いて部屋全体の平均照度を求める計算方法を何と呼ぶ？",
+            options: ["逆2乗の法則", "逐点法", "光束法", "輝度計算法"],
+            answer: "光束法"
+        },
+        {
+            question: "トンネル内の照明のように、効率を最優先し、演色性は問われない場所でよく使われるランプは？",
+            options: ["ハロゲン電球", "メタルハライドランプ", "高圧ナトリウムランプ", "蛍光ランプ"],
+            answer: "高圧ナトリウムランプ"
+        },
+        {
+            question: "演色性が最も優れている(Ra=100)光源は次のうちどれか？",
+            options: ["LEDランプ", "白熱電球", "蛍光ランプ", "高圧水銀ランプ"],
+            answer: "白熱電球"
+        }
+    ];
+
+    let currentQuizIndex = 0;
+    const quizQuestionEl = document.getElementById('quiz-question');
+    const quizOptionsEl = document.getElementById('quiz-options');
+    const quizFeedbackEl = document.getElementById('quiz-feedback');
+    const nextQuizBtn = document.getElementById('next-quiz-btn');
+
+    function loadQuiz() {
+        quizFeedbackEl.style.display = 'none';
+        nextQuizBtn.disabled = true;
+        quizOptionsEl.innerHTML = '';
+        const currentQuiz = quizData[currentQuizIndex];
+        quizQuestionEl.textContent = `Q${currentQuizIndex + 1}: ${currentQuiz.question}`;
+        
+        // Shuffle options
+        const shuffledOptions = [...currentQuiz.options].sort(() => Math.random() - 0.5);
+
+        shuffledOptions.forEach(optionText => {
+            const button = document.createElement('button');
+            button.textContent = optionText;
+            button.addEventListener('click', () => selectAnswer(button, currentQuiz.answer));
+            quizOptionsEl.appendChild(button);
+        });
+    }
+
+    function selectAnswer(selectedButton, correctAnswer) {
+        Array.from(quizOptionsEl.children).forEach(btn => btn.disabled = true);
+        
+        if (selectedButton.textContent === correctAnswer) {
+            quizFeedbackEl.textContent = '正解です！';
+            quizFeedbackEl.className = 'quiz-feedback correct';
+        } else {
+            quizFeedbackEl.textContent = `不正解。正解は「${correctAnswer}」です。`;
+            quizFeedbackEl.className = 'quiz-feedback incorrect';
+        }
+        quizFeedbackEl.style.display = 'block';
+        nextQuizBtn.disabled = false;
+
+        if (currentQuizIndex === quizData.length - 1) {
+            nextQuizBtn.textContent = '最初からやり直す';
+        }
+    }
+    
+    nextQuizBtn.addEventListener('click', () => {
+        currentQuizIndex++;
+        if (currentQuizIndex >= quizData.length) {
+            currentQuizIndex = 0;
+            nextQuizBtn.textContent = '次の問題へ';
+        }
+        loadQuiz();
+    });
+
+    loadQuiz();
+});
+</script>
+
+</body>
+</html>
